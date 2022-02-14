@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="/style.css">
   <script>
 
-    const handleResponse = async (response, contentType) => {
+    const handleResponse = async (response, methodType) => {
       const content = document.querySelector('#content'); // writing to content section
 
       //Switch based on the response status code 
@@ -27,62 +27,57 @@
           break;
       }
 
+      if (methodType) {
 
-      let resObj = await response.json();
+        let obj = await response.json();
 
-      content.innerHTML += `<p>${resObj.message}</p>`;
+        let jsonString = JSON.stringify(obj);
+        content.innerHTML += `<p>${jsonString}</p>`;
+
+      } else {
+
+        let resObj = await response.json();
+
+        content.innerHTML += `<p>${resObj.message}</p>`;
+
+      }
+
 
     };//end handleResponse
 
-    const sendFetch = async (url) => {
-      const response = await fetch(url);
-      handleResponse(response);
+
+    const requestUpdate = async (userForm) => {
+
+      // /getUsers vs /notReal 
+      const url = userForm.querySelector('#urlField').value;
+
+      // Get vs Head
+      const method = userForm.querySelector('#methodSelect').value;
+
+      //Await our fetch response. Go to the URL, use the right method, and attach the headers.
+      let response = await fetch(url, {
+        method,
+        headers: {
+          'Accept': 'application/json'
+        },
+      });
+
+      handleResponse(response, method);
     };
 
-
     const init = () => {
-      //Grab references to drop down and button.
-      //ref to the form for the submit btn
+      //grab form
       const userForm = document.querySelector('#userForm');
-      const nameForm = document.querySelector('#nameForm');
 
-      //get users vs notReal
-      const userOptions = document.querySelector('#urlField');
+      //handle request
+      const getUsers = (e) => {
+        e.preventDefault();
+        requestUpdate(userForm);
+        return false;
+      }
 
-      //GET vs HEAD select 
-      const typeOptions = document.querySelector('#methodSelect');
-
-
-      const getStatus = (e) => {
-        //depending on the current drop down selected, show corresponding message using sendFetch Fns
-        switch (userOptions.value) {
-          case '/getUsers':
-            if (typeOptions.value === 'GET') {
-              sendFetch('/success');
-              break;
-            } else {
-              sendFetch('/success');
-              break;
-            }
-          case '/notReal':
-            if (typeOptions.value === 'GET') {
-              sendFetch("/notFound");
-              //send error Message 
-              break;
-            } else {
-              sendFetch('/notFound');
-              //no error message
-              break;
-            }
-          default:
-            sendFetch("/notFound");
-            break;
-        }//end switch
-
-      }//end getStatus
-
-      //when the button is clicked, go to getStatus fns
-      userForm.addEventListener('submit', (getStatus));
+      //add event listener when button is clicked/submitted
+      userForm.addEventListener('submit', getUsers);
     };
 
     window.onload = init;

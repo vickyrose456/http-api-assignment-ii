@@ -74,7 +74,7 @@ const handleResponse = async (response, contentType) => {
       }//end getStatus
 
       //when the button is clicked, go to getStatus fns
-      userForm.addEventListener('submit', (getStatus));
+      //userForm.addEventListener('submit', (getStatus));
     };
 
     window.onload = init;
