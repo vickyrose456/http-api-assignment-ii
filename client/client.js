@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Our simple HTTP server</title>
-  <link rel="stylesheet" type="text/css" href="/style.css">
-  <script>
-
-    const handleResponse = async (response, contentType) => {
+const handleResponse = async (response, contentType) => {
       const content = document.querySelector('#content'); // writing to content section
 
       //Switch based on the response status code 
@@ -23,7 +15,7 @@
         case 404:
           content.innerHTML = `<b>Resource Not Found</b>`;
         default:
-          content.innerHTML = `<b>Error!!</b>`;
+          content.innerHTML = `<b>Error code not implemented by client.</b>`;
           break;
       }
 
@@ -87,34 +79,49 @@
 
     window.onload = init;
 
-  </script>
+/*const handleResponse = async (response) => {
+    const content = document.getElementById('content');
 
-</head>
+    switch(response.status) {
+      case 200:
+        content.innerHTML = `<b>Success</b>`;
+        break;
+      case 400:
+        content.innerHTML = `<b>Bad Request</b>`;
+        break;
+      case 404:
+        content.innerHTML = `<b>Not Found</b>`;
+        break;
+      default:
+        content.innerHTML = `<p>Status Code not Implemented By Client</p>`;
+        break;
+    }
 
-<body>
-  <section id="top">
-    <h3>POST Status Code Tests</h3>
-    <form id="nameForm" action="/addUser" method="post">
-      <label for="name">Name: </label>
-      <input id="nameField" type="text" name="name" />
-      <label for="age">Age: </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1" />
-      <input type="submit" value="Add User" />
-    </form>
-    <form id="userForm" action="/getUsers" method="get">
-      <select id='urlField'>
-        <option value='/getUsers'>/getUsers</option>
-        <option value='/notReal'>/notReal</option>
-      </select>
-      <select id="methodSelect">
-        <option value="get">GET</option>
-        <option value="head">HEAD</option>
-      </select>
-      <input type="submit" value="Get User" />
-    </form>
-  </section>
-  <section id="content">
-  </section>
-</body>
+    const resObj = await response.json();
+    content.innerHTML += `<p>${resObj.message}</p>`;
+};
 
-</html>
+const sendFetch = async (url) => {
+    const response = await fetch(url);
+    handleResponse(response);
+};
+
+const init = () => {
+    const successButton = document.querySelector("#success");
+    const badRequestButton = document.querySelector("#badRequest");
+    const notFoundButton = document.querySelector("#notFound");
+
+    const success = () => sendFetch('/success');
+    const badRequest = () => sendFetch('/badRequest');
+    const notFound = () => sendFetch('/somethingUnhandled');
+
+    successButton.addEventListener('click', success);
+    badRequestButton.addEventListener('click', badRequest);
+    notFoundButton.addEventListener('click', notFound);
+
+    test.print();
+
+    const arr = [1, 2, 3, 4, 5];
+    const chunked = _.chunk(arr, 3);
+    console.log(chunked);
+};*/
