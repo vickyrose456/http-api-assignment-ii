@@ -21,12 +21,15 @@ const success = (request, response) => {
   // json object to send
   const responseJSON = {
     users,
-    message: 'This is a successful response!',
-    id: 'Success',
   };
 
   // return 200 with message
   return respondJSON(request, response, 200, responseJSON);
+};
+
+const successMeta = (request, response) => {
+  // return 200 without message, just the meta data
+  respondJSONMeta(request, response, 200);
 };
 
 // function just to update our object
@@ -63,6 +66,7 @@ const notFoundMeta = (request, response) => {
 
 module.exports = {
   success,
+  successMeta,
   addUser,
   notFoundMeta,
   notFound,
