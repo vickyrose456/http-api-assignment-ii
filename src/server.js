@@ -13,6 +13,7 @@ const port = process.env.PORT || process.env.NODE_PORT || 3000;
 const urlStruct = {
   '/': htmlHandler.getIndex,
   '/style.css': htmlHandler.getCSS,
+  '/bundle.js': htmlHandler.getBundle,
   '/success': jsonHandler.success,
   '/badRequest': jsonHandler.badRequest,
   '/unauthorized': jsonHandler.unauthorized,
@@ -23,18 +24,15 @@ const urlStruct = {
 };
 
 const onRequest = (request, response) => {
-  const parsedUrl = url.parse(request.url);
-
-  const params = query.parse(parsedUrl.query);
-
-  const type = request.headers.accept.split(',');
-
-  if (urlStruct[parsedUrl.pathname]) {
-    urlStruct[parsedUrl.pathname](request, response, params, type);
-  } else {
-    urlStruct.notFound(request, response, params, type);
-  }
-};
+    const parsedUrl = url.parse(request.url);
+    const params = query.parse(parsedUrl.query);
+  
+    if (urlStruct[parsedUrl.pathname]) {
+      urlStruct[parsedUrl.pathname](request, response, params);
+    } else {
+      urlStruct.notFound(request, response, params);
+    }
+  };
 
 http.createServer(onRequest).listen(port);
 
