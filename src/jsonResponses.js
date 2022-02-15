@@ -17,41 +17,63 @@ const respondJSONMeta = (request, response, status) => {
   response.end();
 };
 
-const success = (request, response) => {
+const getUsers = (request, response) => {
   // json object to send
   const responseJSON = {
     users,
+    message: 'Success!'
   };
 
   // return 200 with message
   return respondJSON(request, response, 200, responseJSON);
 };
 
-const successMeta = (request, response) => {
+const getUsersMeta = (request, response) => {
   // return 200 without message, just the meta data
   respondJSONMeta(request, response, 200);
 };
 
 // function just to update our object
-const addUser = (request, response) => {
+const addUser = (request, response, body) => {
   // change to make to user
-  // This is just a dummy object for example
-  const newUser = {
-    createdAt: Date.now(),
+  const responseJSON = {
+    message: 'Name and age are both required.',
   };
 
-  users[newUser.createdAt] = newUser;
+  
+  if (!body.name || !body.age) {
+    responseJSON.id = 'missingParams';
+    return respondJSON(request, response, 400, responseJSON);
+  }
 
-  // return a 201 created status
-  return respondJSON(request, response, 201, newUser);
+  //default status code to 204 updated
+  let responseCode = 204;
+
+  //If the user doesn't exist yet
+  if(!users[body.name]) {
+    
+    //Set the status code to 201 (created) and create an empty user
+    responseCode = 201;
+    users[body.name] = {};
+  }
+
+  //add or update fields for this user name
+  users[body.name].name = body.name;
+  users[body.name].age = body.age;
+
+  if (responseCode === 201) {
+    responseJSON.message = 'Created Successfully';
+    return respondJSON(request, response, responseCode, responseJSON);
+  }
+  return respondJSONMeta(request, response, responseCode);
 };
 
 // function to show not found error
 const notFound = (request, response) => {
-  // error message with a description and consistent error id
+  // error message with a description
   const responseJSON = {
     message: 'The page you are looking for was not found.',
-    id: 'notFound',
+    
   };
 
   // return our json with a 404 not found error code
@@ -65,8 +87,8 @@ const notFoundMeta = (request, response) => {
 };// not found meta
 
 module.exports = {
-  success,
-  successMeta,
+  getUsers,
+  getUsersMeta,
   addUser,
   notFoundMeta,
   notFound,

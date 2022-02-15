@@ -33,16 +33,46 @@
 
         let jsonString = JSON.stringify(obj);
 
+
         content.innerHTML += `<p>${jsonString}</p>`;
 
       } else {
 
-        content.innerHTML += '<p>Meta Data Received</p>';
+        //content.innerHTML += '<p>Meta Data Received</p>';
 
       }
 
 
     };//end handleResponse
+
+
+    //uses fetch () to get a post request
+    const sendPost = async (nameForm) => {
+      //info from name form
+      const nameAction = nameForm.getAttribute('action');
+      const nameMethod = nameForm.getAttribute('method');
+
+      //name and age inputs
+      const nameField = nameForm.querySelector('#nameField');
+      const ageField = nameForm.querySelector('#ageField');
+
+
+      const formData = `name=${nameField.value}&age=${ageField.value}`;
+
+      let response = await fetch(nameAction, {
+        method: nameMethod,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        },
+        body: formData,
+      });
+
+      //Once we have a response, handle it.
+      handleResponse(response);
+
+
+    };
 
 
     const requestUpdate = async (userForm) => {
@@ -67,16 +97,25 @@
     const init = () => {
       //grab form
       const userForm = document.querySelector('#userForm');
+      const nameForm = document.querySelector('#nameForm');
 
-      //handle request
+      //handle request for get users
       const getUsers = (e) => {
         e.preventDefault();
         requestUpdate(userForm);
         return false;
       }
 
+      //handle requests for addUser
+      const addUser = (e) => {
+        e.preventDefault();
+        sendPost(nameForm);
+        return false;
+      }
+
       //add event listener when button is clicked/submitted
       userForm.addEventListener('submit', getUsers);
+      nameForm.addEventListener('submit', addUser);
     };
 
     window.onload = init;
