@@ -1,6 +1,6 @@
-const http = require('http'); 
+const http = require('http');
 
-const url = require('url'); 
+const url = require('url');
 
 const query = require('querystring');
 
@@ -9,30 +9,15 @@ const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-//handle POST requests
-const handlePost = (request, response, parsedUrl) => {
-  
-  //If they go to /addUser
-  if(parsedUrl.pathname === '/addUser') {
-    
-    parseBody(request, response, jsonHandler.addUser);
-  
-  }
-
-};
-
 const parseBody = (request, response, handler) => {
-  
   const body = [];
 
-  
   request.on('error', (err) => {
     console.dir(err);
     response.statusCode = 400;
     response.end();
   });
 
-  
   request.on('data', (chunk) => {
     body.push(chunk);
   });
@@ -43,7 +28,15 @@ const parseBody = (request, response, handler) => {
 
     handler(request, response, bodyParams);
   });
-};
+}; // end parseBody
+
+// handle POST requests
+const handlePost = (request, response, parsedUrl) => {
+  // If they go to /addUser
+  if (parsedUrl.pathname === '/addUser') {
+    parseBody(request, response, jsonHandler.addUser);
+  }
+};// end handlePost
 
 const urlStruct = {
 
@@ -70,15 +63,12 @@ const urlStruct = {
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
 
-  
   if (request.method === 'POST') {
     handlePost(request, response, parsedUrl);
+  } else if (urlStruct[request.method][parsedUrl.pathname]) {
+    urlStruct[request.method][parsedUrl.pathname](request, response);
   } else {
-    if(urlStruct[request.method][parsedUrl.pathname]){
-      urlStruct[request.method][parsedUrl.pathname](request, response);
-    } else {
-      urlStruct[request.method].notFound(request, response);
-    }
+    urlStruct[request.method].notFound(request, response);
   }
 };
 
