@@ -4,10 +4,12 @@
 <head>
   <title>Our simple HTTP server</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
+
   <script>
 
-    const handleResponse = async (response, methodType) => {
-      const content = document.querySelector('#content'); // writing to content section
+    const handleResponse = async (response, pResponse) => {
+
+      const content = document.querySelector('#content');
 
       //Switch based on the response status code 
       switch (response.status) {
@@ -27,38 +29,41 @@
           break;
       }
 
-      if (methodType) {
 
+      if (pResponse) {
+        //parse the JSON
         let obj = await response.json();
 
         let jsonString = JSON.stringify(obj);
-
-
         content.innerHTML += `<p>${jsonString}</p>`;
 
+        //If we have a message, display it.
+        //if (obj.message) {
+        //content.innerHTML += `<p>${obj.message}</p>`;
+        //}
       } else {
-
         //content.innerHTML += '<p>Meta Data Received</p>';
-
       }
 
 
-    };//end handleResponse
 
+    };
 
-    //uses fetch () to get a post request
+    //Uses fetch to send a post Request 
+
     const sendPost = async (nameForm) => {
-      //info from name form
+      //Grab info from the form
       const nameAction = nameForm.getAttribute('action');
       const nameMethod = nameForm.getAttribute('method');
 
-      //name and age inputs
+      //name and age of user we want to add
       const nameField = nameForm.querySelector('#nameField');
       const ageField = nameForm.querySelector('#ageField');
 
-
+      //Build a data string in the FORM-URLENCODED format.
       const formData = `name=${nameField.value}&age=${ageField.value}`;
 
+      //Make a fetch request
       let response = await fetch(nameAction, {
         method: nameMethod,
         headers: {
@@ -68,22 +73,17 @@
         body: formData,
       });
 
-      //Once we have a response, handle it.
       handleResponse(response);
-
-
-    };
+    };//end send post
 
 
     const requestUpdate = async (userForm) => {
 
-      // /getUsers vs /notReal 
+      //Grab the url and method from the html form below
       const url = userForm.querySelector('#urlField').value;
-
-      // Get vs Head
       const method = userForm.querySelector('#methodSelect').value;
 
-      //Await our fetch response. Go to the URL, use the right method, and attach the headers.
+      //Await our fetch response.
       let response = await fetch(url, {
         method,
         headers: {
@@ -91,35 +91,36 @@
         },
       });
 
-      handleResponse(response, method);
+      handleResponse(response, method === 'get');
     };
 
+
     const init = () => {
-      //grab form
-      const userForm = document.querySelector('#userForm');
+      //Grab the form
       const nameForm = document.querySelector('#nameForm');
+      const userForm = document.querySelector('#userForm');
 
-      //handle request for get users
-      const getUsers = (e) => {
-        e.preventDefault();
-        requestUpdate(userForm);
-        return false;
-      }
-
-      //handle requests for addUser
+      //Create an addUser fns
       const addUser = (e) => {
         e.preventDefault();
         sendPost(nameForm);
         return false;
       }
 
-      //add event listener when button is clicked/submitted
-      userForm.addEventListener('submit', getUsers);
+      //Create getUser fns
+      const getUsers = (e) => {
+        e.preventDefault();
+        requestUpdate(userForm);
+        return false;
+      }
+
+      //Call addUser when the submit event fires on the name form.
       nameForm.addEventListener('submit', addUser);
+      userForm.addEventListener('submit', getUsers);
     };
 
-    window.onload = init;
 
+    window.onload = init;
   </script>
 
 </head>

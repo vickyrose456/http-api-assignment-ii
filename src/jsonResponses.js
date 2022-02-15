@@ -1,46 +1,32 @@
 const users = {};
 
 const respondJSON = (request, response, status, object) => {
-  // set status code and content type (application/json)
   response.writeHead(status, { 'Content-Type': 'application/json' });
-
   response.write(JSON.stringify(object));
-
   response.end();
 };
 
 const respondJSONMeta = (request, response, status) => {
-  const headers = {
-    'Content-Type': 'application/json',
-  };
-  response.writeHead(status, headers);
+  response.writeHead(status, { 'Content-Type': 'application/json' });
   response.end();
 };
 
+//return user object as JSON
 const getUsers = (request, response) => {
-  // json object to send
   const responseJSON = {
     users,
-    message: 'Success!'
   };
 
-  // return 200 with message
-  return respondJSON(request, response, 200, responseJSON);
+  respondJSON(request, response, 200, responseJSON);
 };
 
-const getUsersMeta = (request, response) => {
-  // return 200 without message, just the meta data
-  respondJSONMeta(request, response, 200);
-};
-
-// function just to update our object
+//function to add a user from a POST body
 const addUser = (request, response, body) => {
-  // change to make to user
+  //default json message
   const responseJSON = {
     message: 'Name and age are both required.',
   };
 
-  
   if (!body.name || !body.age) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
@@ -61,12 +47,16 @@ const addUser = (request, response, body) => {
   users[body.name].name = body.name;
   users[body.name].age = body.age;
 
+  //if response is created, then set our created message
+  //and sent response with a message
   if (responseCode === 201) {
     responseJSON.message = 'Created Successfully';
     return respondJSON(request, response, responseCode, responseJSON);
   }
+  
   return respondJSONMeta(request, response, responseCode);
-};
+}; //end addUser
+
 
 // function to show not found error
 const notFound = (request, response) => {
@@ -86,10 +76,11 @@ const notFoundMeta = (request, response) => {
   respondJSONMeta(request, response, 404);
 };// not found meta
 
+//public exports
 module.exports = {
   getUsers,
-  getUsersMeta,
   addUser,
-  notFoundMeta,
   notFound,
+  notFoundMeta
 };
+
